@@ -37,16 +37,14 @@ class Recom(Resource):
         through the API. It currently returns a random sample of products. """
         # randcursor = database.products.aggregate([{ '$sample': { 'size': count } }])
         # prodids = list(map(lambda x: x['_id'], list(randcursor)))
-        return Recom.simple_recom(self), 200
+        return self.simple_recom(), 200
 
     def simple_recom(self):
-        query = "SELECT productid FROM top4Sold LIMIT 4"
-        cursor.execute(query)
-        top4 = cursor.fetchall()
-        top = []
-        for productid in top4:
-            top.append(productid[0])
-        return top
+        data = PGAdmin.getdata(cursor, "SELECT productid FROM top4Sold LIMIT 4", '', False)
+        top4 = []
+        for productid in data:
+            top4.append(productid[0])
+        return top4
 
 # This method binds the Recom class to the REST API, to parse specifically
 # requests in the format described below.
