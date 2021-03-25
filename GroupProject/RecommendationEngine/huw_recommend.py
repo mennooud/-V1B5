@@ -43,7 +43,7 @@ class Recom(Resource):
             return prodids, 200
 
     def simple_recom(self):
-        data = PGAdmin.getdata(cursor, "SELECT productid FROM top4Sold LIMIT 4", '', False)
+        data = PGAdmin.getdata(cursor, "SELECT productid FROM topSold LIMIT 4", '', False)
         top4 = []
         for productid in data:
             top4.append(productid[0])
