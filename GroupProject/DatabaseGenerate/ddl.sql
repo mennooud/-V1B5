@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS TopSold;
 DROP TABLE IF EXISTS Orderedproducts;
 DROP TABLE IF EXISTS Recommendedproducts;
 DROP TABLE IF EXISTS Viewedproducts;
