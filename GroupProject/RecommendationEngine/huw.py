@@ -218,17 +218,22 @@ class HUWebshop(object):
         packet['profile_id'] = session['profile_id']
         packet['shopping_cart'] = session['shopping_cart']
         packet['shopping_cart_count'] = self.shoppingcartcount()
+        if template == 'homepage.html':
+            packet['r_products'] = self.recommendations(4, 0, 'none1', 'none2', 'none3', 'none4')
+            packet['r_type'] = list(self.recommendationtypes.keys())[0]
+            packet['r_string'] = list(self.recommendationtypes.values())[0]
         return render_template(template, packet=packet)
 
     """ ..:: Recommendation Functions ::.. """
 
-    def recommendations(self, count):
+    def recommendations(self, count, page, cat1, cat2, prodid, prodids):
         """ This function returns the recommendations from the provided page
         and context, by sending a request to the designated recommendation
         service. At the moment, it only transmits the profile ID and the number
         of expected recommendations; to have more user information in the REST
         request, this function would have to change."""
-        resp = requests.get(self.recseraddress+"/"+session['profile_id']+"/"+str(count))
+        resp = requests.get(self.recseraddress+"/"+session['profile_id']+"/"+cat1+"/"+cat2+"/"+str(prodid)+"/"+
+                            str(prodids)+"/"+str(page)+"/"+str(count))
         if resp.status_code == 200:
             recs = eval(resp.content.decode())
             queryfilter = {"_id": {"$in": recs}}
@@ -258,15 +263,17 @@ class HUWebshop(object):
         prodlist = list(map(self.prepproduct, list(querycursor)))
         if len(nononescats) > 1:
             pagepath = "/producten/"+("/".join(nononescats))+"/"
+            cats2 = cat2
         else:
             pagepath = "/producten/"
+            cats2 = 'none2'
         return self.renderpackettemplate('products.html', {'products': prodlist, \
             'productcount': prodcount, \
             'pstart': skipindex + 1, \
             'pend': skipindex + session['items_per_page'] if session['items_per_page'] > 0 else prodcount, \
             'prevpage': pagepath+str(page-1) if (page > 1) else False, \
             'nextpage': pagepath+str(page+1) if (session['items_per_page']*page < prodcount) else False, \
-            'r_products':self.recommendations(4), \
+            'r_products':self.recommendations(4, 1, cat1, cats2, 'none3', 'none4'), \
             'r_type':list(self.recommendationtypes.keys())[0],\
             'r_string':list(self.recommendationtypes.values())[0]\
             })
@@ -277,19 +284,23 @@ class HUWebshop(object):
         product = self.database.products.find_one({"_id":str(productid)})
         return self.renderpackettemplate('productdetail.html', {'product':product,\
             'prepproduct':self.prepproduct(product),\
-            'r_products':self.recommendations(4), \
+            'r_products':self.recommendations(4, 2, 'none1', 'none2', productid, 'none4'), \
             'r_type':list(self.recommendationtypes.keys())[1],\
             'r_string':list(self.recommendationtypes.values())[1]})
 
     def shoppingcart(self):
         """ This function renders the shopping cart for the user."""
         i = []
+        prodids = ""
         for tup in session['shopping_cart']:
             product = self.prepproduct(self.database.products.find_one({"_id":str(tup[0])}))
             product["itemcount"] = tup[1]
             i.append(product)
+            prodids += tup[0]+":"
+        if prodids == "":
+            prodids = "none4"
         return self.renderpackettemplate('shoppingcart.html',{'itemsincart':i,\
-            'r_products':self.recommendations(4), \
+            'r_products':self.recommendations(4, 3, 'none1', 'none2', 'none3', prodids), \
             'r_type':list(self.recommendationtypes.keys())[2],\
             'r_string':list(self.recommendationtypes.values())[2]})
 

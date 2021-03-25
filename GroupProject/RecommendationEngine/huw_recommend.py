@@ -32,12 +32,15 @@ class Recom(Resource):
     the webshop. At the moment, the API simply returns a random set of products
     to recommend."""
 
-    def get(self, profileid, count):
+    def get(self, profileid, cat1, cat2, product, productids, page, count):
         """ This function represents the handler for GET requests coming in
         through the API. It currently returns a random sample of products. """
-        # randcursor = database.products.aggregate([{ '$sample': { 'size': count } }])
-        # prodids = list(map(lambda x: x['_id'], list(randcursor)))
-        return self.simple_recom(), 200
+        if cat2 == "dierverzorging":
+            return self.simple_recom(), 200
+        else:
+            randcursor = database.products.aggregate([{ '$sample': { 'size': count } }])
+            prodids = list(map(lambda x: x['_id'], list(randcursor)))
+            return prodids, 200
 
     def simple_recom(self):
         data = PGAdmin.getdata(cursor, "SELECT productid FROM top4Sold LIMIT 4", '', False)
@@ -46,6 +49,7 @@ class Recom(Resource):
             top4.append(productid[0])
         return top4
 
+
 # This method binds the Recom class to the REST API, to parse specifically
 # requests in the format described below.
-api.add_resource(Recom, "/<string:profileid>/<int:count>")
+api.add_resource(Recom, "/<string:profileid>/<string:cat1>/<string:cat2>/<string:product>/<string:productids>/<int:page>/<int:count>")
