@@ -18,3 +18,39 @@ Timo
 • 	Gister heb ik samen met het team de startproducten voor sprint 1 gemaakt en ingeleverd, waaronder dus de trello aangemaakt en ingedeeld (sprint backlog & planning) 
 •	Vandaag ga ik 1 recommendation uitwerken en meehelpen met het overzetten van de data naar de relationele database
 •	Het overzetten van de informatie naar de relationele database werkt nog niet helemaal.
+
+
+Woensdag 24-03-2021
+
+Menno
+•	
+•	Troubleshooten front-end. Idee recommendation uitwerken.
+•	Morgen heb ik een korte dag om aan het project te werken.
+
+Luka
+•	Ik ben gisteren bezig geweest met het controleren van de datakoppeling op errors en deze weg te werken.
+•	Ik ga vandaag hopelijk de laatste errors uit het programma halen en een begin maken aan mijn idee uitwerken.
+•	Onvoorziene errors zouden ons in de weg kunnen staan en het missen van ons vierde teamlid kan ons ook limiteren in wat we kunnen bereiken
+
+Timo
+• 	Gisteren heb ik de simpele recommendation uitgewerkt en gemaakt, en de trello uitgebreidt en verbetert.
+•	Vandaag ga ik een idee voor een recommendation uitwerken en hopelijk een start maken met het coderen daarvan.
+•	Het overzetten van de informatie naar de relationele database is nog niet helemaal gelukt, en dat heb ik wel nodig als ik wil beginnen met coderen.
+
+
+Donderdag 25-03-2021
+
+Menno
+•	Troubleshooten front-end.
+•	Scrum demo voorbereiden.
+•	Weinig tijd gehad vandaag om mijn recommendation uit te werken. Morgen voor de demo op focussen.
+
+Luka
+•	Ik ben gisteren bezig geweest met errors wegwerken in onze oorspronkelijke datakoppeling en heb na het volledig overzetten een backup van deze database gemaakt.
+•	Ik ga vandaag mijn idee voor een recommendation uitwerken in een user story en eventueel nog helpen met de simpele recommendation en misschien een begin maken aan de presentatie voor de demo van vrijdag.
+•	Als ik goed in staat ben op tijd een user story voor mijn nieuwe idee uit te werken denk ik dat er geen obstakels zijn
+
+Timo
+• 	 
+•	
+•	
