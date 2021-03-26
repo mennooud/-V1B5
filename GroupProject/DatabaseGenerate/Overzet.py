@@ -166,9 +166,9 @@ cursor = PGAdmin.makecursor(connection)
 cursor.execute(f"select * from products where productid='{'01001'}'")
 print(cursor.fetchone())
 print('Inputting products')
-# inputproducts(items, connection, cursor, oldtonewproducts)
+inputproducts(items, connection, cursor, oldtonewproducts)
 print('Inputting profiles')
-# buids = inputprofiles(profiles, connection, cursor, oldtonewprofiles)
+buids = inputprofiles(profiles, connection, cursor, oldtonewprofiles)
 
 # deze onderstaande code kan gebruikt worden als het niet lukt om de gehele tabel in één keer in te vullen
 # de buids worden dan opgeslagen in een json file zodat het mogelijk is de tabel in stappen in te vullen
@@ -181,6 +181,6 @@ print('Inputting profiles')
 #     json.dump(newbuids, jsonfile, indent=4)
 
 print('Inputting sessions')
-# inputsessions(sessions, buids, connection, cursor, oldtonewsessions)
+inputsessions(sessions, buids, connection, cursor, oldtonewsessions)
 PGAdmin.closeconnection(connection, cursor)
 
