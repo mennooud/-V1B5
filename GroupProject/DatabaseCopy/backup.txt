@@ -1,2 +1,5 @@
 link naar google drive backup
 https://drive.google.com/drive/folders/1TO-5Ki3-031eFBSVpkiySjy73qzHi3qE?usp=sharing
+
+gebruik de 'Restore' optie in PGAdmin om de gehele database in +/- 80 seconden
+te importeren

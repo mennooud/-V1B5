@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 import psycopg2
-import MongoDB
+import MongoDB  # TODO: markeer 'GeneralModules' directory als 'Sources Root'
 import PGAdmin
 import json
 
@@ -163,6 +163,8 @@ profiles = MongoDB.getitems(profileinfo)
 # TODO: verander onderstaande gegevens zodat ze kloppen voor je lokale database
 connection = PGAdmin.makeconnection('localhost', 'Recommendation', 'postgres', 'broodje123')
 cursor = PGAdmin.makecursor(connection)
+cursor.execute(f"select * from products where productid='{'01001'}'")
+print(cursor.fetchone())
 print('Inputting products')
 inputproducts(items, connection, cursor, oldtonewproducts)
 print('Inputting profiles')
