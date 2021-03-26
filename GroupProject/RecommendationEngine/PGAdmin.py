@@ -1,6 +1,6 @@
 import psycopg2
 # deze module is tijdelijk i.v.m. dat de module in de andere directory niet altijd herkend wordt
-# bij het runnen van een shell script
+# bij het runnen van de file in een shell script
 
 def makeconnection(host, database, user, password):
     '''Deze functie maakt een connectie met een PGAdmin database'''
