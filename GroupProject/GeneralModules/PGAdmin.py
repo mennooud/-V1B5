@@ -20,9 +20,12 @@ def closeconnection(connection, cursor):
     connection.close()
 
 
-def insertdata(cursor, query, values):
+def insertdata(cursor, query, values=None):
     '''Deze functie voert data in in de database'''
-    cursor.execute(query, values)
+    if values:
+        cursor.execute(query, values)
+    else:
+        cursor.execute(query)
 
 
 def getdata(cursor, query, values, fetchone=True):
