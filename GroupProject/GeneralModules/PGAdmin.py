@@ -31,3 +31,7 @@ def getdata(cursor, query, values, fetchone=True):
     if fetchone:
         return cursor.fetchone()
     return cursor.fetchall()
+
+
+def executequery(cursor, query):
+    cursor.execute(query)
