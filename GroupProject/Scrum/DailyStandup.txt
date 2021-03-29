@@ -51,6 +51,24 @@ Luka
 •	Als ik goed in staat ben op tijd een user story voor mijn nieuwe idee uit te werken denk ik dat er geen obstakels zijn
 
 Timo
-• 	 
+• 	 gisteren heb ik de code aangepast zodat we verschillende recommendations kunnen geven op elke pagina, door de nodige informatie van de front-end, door te geven aan de recommendation engine
+•    vandaag ga ik verder met het uitwerken van een recommendation, en het afmaken van de code, zodat we voor de verschillende recommendations alle info krijgen    die we nodig hebben
+•	   Mijn database is nog niet volledig, maar dat is hopelijk snel opgelost
+
+Vrijdag 26-03-2021
+
+Menno
+•	  Scrum demo voorbereiden en troubleshooten front-end
+•	  Scrum demo voorbereiden en uitvoeren
+•   Ik zie alleen een obstakel als ik de front-end niet voor elkaar krijg te runnen.
+
+Luka
 •	
 •	
+•	
+
+Timo
+• 	 Gister heb ik de recommendation uitgewerkt en de code afgemaakt, zodat we alle informatie krijgen die we nodig hebben
+•    Vandaag ga ik de demo voorbereiden, en mijn teamgenoten helpen met eventuele problemen waar ze nog tegen aan lopen
+•	   We missen een teamlid, al de hele week
+

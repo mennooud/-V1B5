@@ -14,7 +14,7 @@ envvals = ["MONGODBUSER","MONGODBPASSWORD","MONGODBSERVER"]
 dbstring = 'mongodb+srv://{0}:{1}@{2}/test?retryWrites=true&w=majority'
 
 # Since we are asked to pass a class rather than an instance of the class to the
-# add_resource method, we open the connection to the database outside of the 
+# add_resource method, we open the connection to the database outside of the
 # Recom class.
 load_dotenv()
 if os.getenv(envvals[0]) is not None:
@@ -24,7 +24,7 @@ else:
     client = MongoClient()
 database = client.huwebshop
 
-connection = PGAdmin.makeconnection('localhost', 'Recommendation', 'postgres', 'broodje123')
+connection = PGAdmin.makeconnection('localhost', 'huwebshop', 'postgres', '1234')
 cursor = PGAdmin.makecursor(connection)
 
 class Recom(Resource):
@@ -43,7 +43,7 @@ class Recom(Resource):
             return prodids, 200
 
     def simple_recom(self):
-        data = PGAdmin.getdata(cursor, "SELECT productid FROM topSold LIMIT 4", False)
+        data = PGAdmin.getdata(cursor, "SELECT productid FROM topSold LIMIT 4", '', False)
         top4 = []
         for productid in data:
             top4.append(productid[0])
