@@ -24,7 +24,7 @@ else:
     client = MongoClient()
 database = client.huwebshop
 
-connection = PGAdmin.makeconnection('localhost', 'huwebschop', 'postgres', '1234')
+connection = PGAdmin.makeconnection('localhost', 'Recommendation', 'postgres', 'broodje123')
 cursor = PGAdmin.makecursor(connection)
 
 class Recom(Resource):
@@ -43,7 +43,7 @@ class Recom(Resource):
             return prodids, 200
 
     def simple_recom(self):
-        data = PGAdmin.getdata(cursor, "SELECT productid FROM topSold LIMIT 4", '', False)
+        data = PGAdmin.getdata(cursor, "SELECT productid FROM topSold LIMIT 4", False)
         top4 = []
         for productid in data:
             top4.append(productid[0])
