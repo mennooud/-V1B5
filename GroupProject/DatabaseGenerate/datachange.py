@@ -1,2 +1,2 @@
-import pscyopg2
+import PGAdmin as P
 
