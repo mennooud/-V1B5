@@ -28,9 +28,12 @@ def insertdata(cursor, query, values=None):
         cursor.execute(query)
 
 
-def getdata(cursor, query, values, fetchone=True):
+def getdata(cursor, query, values=None, fetchone=True):
     '''Deze functie haalt data op uit de PGAdmin database'''
-    cursor.execute(query, values)
+    if values:
+        cursor.execute(query, values)
+    else:
+        cursor.execute(query)
     if fetchone:
         return cursor.fetchone()
     return cursor.fetchall()
