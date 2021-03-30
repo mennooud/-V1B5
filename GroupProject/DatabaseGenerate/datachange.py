@@ -6,12 +6,10 @@ from pymongo import MongoClient
 def deletecolumn(cursor, table, columnname, normtablename=None):
     '''Deze functie kan een kolom en de eventueel bijbehorende normaliseringstabel weghalen'''
     if normtablename:
-        cursor.execute(f'ALTER TABLE {table} DROP COLUMN {normtablename+columnname+"id"}')
+        cursor.execute(f'ALTER TABLE {table} DROP COLUMN IF EXISTS {normtablename+columnname+"id"}')
         cursor.execute(f'DROP TABLE IF EXISTS {normtablename}')
     else:
         cursor.execute(f'ALTER TABLE {table} DROP COLUMN {columnname}')
-
-
 
 
 def addcolumn(cursor, table, columnname, normtablename=None):
@@ -50,7 +48,7 @@ def addatatocolumn(cursor, data, table, idcolumn, oldcolumnname, columnname, nor
                     f"NOT EXISTS (SELECT * FROM {normtablename} WHERE {columnname}=(%s))"
             P.insertdata(cursor, query, (item, item))
             inputvalue = P.getdata(cursor, f'SELECT {columnname+"id"} FROM {normtablename} '
-                                           f'WHERE {columnname}="{columnname}"')
+                                           f"WHERE {columnname}=%s", (item,))
             P.insertdata(cursor, f"UPDATE {table} SET {normtablename+columnname+'id'}={inputvalue[0]} "
                                  f"WHERE {idcolumn}=%s", (id,))
         else:
@@ -63,7 +61,7 @@ db = client.huwebshop
 allproducts = M.getitems(db.products)
 
 # TODO: verander onderstaande gegevens naar gegevens die kloppen voor je lokale database
-connection= P.makeconnection('localhost', 'test', 'postgres', 'broodje123')
+connection= P.makeconnection('localhost', 'testtest', 'postgres', 'broodje123')
 cursor = P.makecursor(connection)
 
 deletecolumn(cursor, 'products', 'doelgroep', 'doelgroepen')
