@@ -26,6 +26,8 @@ database = client.huwebshop
 
 connection = PGAdmin.makeconnection('localhost', 'huwebshop', 'postgres', '1234')
 cursor = PGAdmin.makecursor(connection)
+weights = {'doelgroep': 0.25, 'bestcategory': 0.2, 'bestsubcategory': 0.25, 'bestbrand': 0.1, 'herhaalpreference': 0.1,
+           'pricepreference': 0.1}
 
 class Recom(Resource):
     """ This class represents the REST API that provides the recommendations for
@@ -37,6 +39,8 @@ class Recom(Resource):
         through the API. It currently returns a random sample of products. """
         if cat2 == "dierverzorging":
             return self.simple_recom(), 200
+        elif page == 3:
+            return self.boughtbyothers(weights, profileid)
         else:
             randcursor = database.products.aggregate([{ '$sample': { 'size': count } }])
             prodids = list(map(lambda x: x['_id'], list(randcursor)))
@@ -48,6 +52,45 @@ class Recom(Resource):
         for productid in data:
             top4.append(productid[0])
         return top4
+
+
+    def boughtbyothers(self, weight, profileid):
+        alreadybought = PGAdmin.getdata(cursor, f"select orderedproductid from orderedprofiles "
+                                                f"where profilesprofileid='{profileid}' ", fetchone=False)
+        print(alreadybought)
+        if alreadybought != []:
+            alreadybought = [item[0] for item in alreadybought]
+            allbought = PGAdmin.getdata(cursor, f"select * from orderedprofiles where not profilesprofileid='{profileid}'",
+                                        fetchone=False)
+            bought = {}
+            for profile in allbought:
+                if profile[0] in bought.keys():
+                    bought[profile[0]].append(profile[1])
+                else:
+                    bought[profile[0]] = [profile[1]]
+            loggedin = PGAdmin.getdata(cursor, f"select * from profileproperties where profilesprofileid='{profileid}'")
+            otherprofiles = PGAdmin.getdata(cursor, f"select * from profileproperties "
+                                                    f"where not profilesprofileid='{profileid}'",
+                                            fetchone=False)
+            result = []
+            for profile in otherprofiles:
+                score = 0
+                for hostprop, prop, weigh in zip(loggedin[1:], profile[1:], weight.values()):
+                    if hostprop is not None and prop is not None:
+                        score += (hostprop == prop) * weigh
+                    if score >= 0.2:
+                        result.append((profile[0], round(score, 2)))
+            result = sorted(result, key=lambda x: (x[1], x[0]), reverse=True)
+            ind = 0
+            recommendedproducts = []
+            while len(recommendedproducts) < 4 and ind <= len(result):
+                [recommendedproducts.append(product) for product in bought[result[ind][0]]
+                 if product not in alreadybought and product not in recommendedproducts
+                 and len(recommendedproducts) < 4]
+                ind += 1
+            return recommendedproducts
+        else:
+            return self.simple_recom()
 
 
 # This method binds the Recom class to the REST API, to parse specifically
