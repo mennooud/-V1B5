@@ -61,7 +61,7 @@ db = client.huwebshop
 allproducts = M.getitems(db.products)
 
 # TODO: verander onderstaande gegevens naar gegevens die kloppen voor je lokale database
-connection= P.makeconnection('localhost', 'testtest', 'postgres', 'broodje123')
+connection = P.makeconnection('localhost', 'huwebshop', 'postgres', '1234')
 cursor = P.makecursor(connection)
 
 deletecolumn(cursor, 'products', 'doelgroep', 'doelgroepen')
