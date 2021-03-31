@@ -57,7 +57,7 @@ def filltable(cursor):
                            f"subprice1 AS(select profileid, round(avg(price), 0) as averageprice from subquery "
                            f"group by profileid), "
                            f"subprice AS(select profileid, averageprice, "
-                           f"case when averageprice >= 0 and averageprice<250 then 'LOW' "
+                           f"case when averageprice > 0 and averageprice<250 then 'LOW' "
                            f"when averageprice>=250 and averageprice<=600 then 'MIDDLE' "
                            f"when averageprice>600 then 'HIGH' "
                            f"end as pricecategory "
@@ -73,9 +73,20 @@ def filltable(cursor):
                            f"left join subprice on subdoelgroep.profileid=subprice.profileid)")
 
 
+def createshortcut(cursor):
+    P.executequery(cursor, f"drop table if exists orderedprofiles")
+    P.executequery(cursor, f"create table orderedprofiles( profilesprofileid varchar, "
+                           f"orderedproductid varchar, FOREIGN KEY (profilesprofileid) references profiles(profileid), "
+                           f"FOREIGN KEY (orderedproductid) references products(productid))")
+    P.executequery(cursor, f"insert into orderedprofiles (select profileid, productsproductid from orderedproducts "
+                           f"left join sessions on sessionssessionid=sessionid "
+                           f"left join profiles on profilesprofileid=profileid)")
+
+
 connection = P.makeconnection('localhost', 'test', 'postgres', 'broodje123')
 cursor = P.makecursor(connection)
-maketable(cursor)
-filltable(cursor)
+# maketable(cursor)
+# filltable(cursor)
+createshortcut(cursor)
 connection.commit()
 P.closeconnection(connection, cursor)
