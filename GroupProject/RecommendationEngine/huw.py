@@ -35,7 +35,8 @@ class HUWebshop(object):
 
     recommendationtypes = {'popular':"Anderen kochten ook",'similar':"Soortgelijke producten",
                            'combination':'Combineert goed met','behaviour':'Passend bij uw gedrag',
-                           'personal':'Persoonlijk aanbevolen','othersbought': 'Anderen kochten ook'}
+                           'personal':'Persoonlijk aanbevolen','othersbought': 'Anderen kochten ook',
+                           'mostviewed': "Meest bekeken"}
 
     """ ..:: Initialization and Category Index Functions ::.. """
 
@@ -222,8 +223,8 @@ class HUWebshop(object):
         packet['shopping_cart_count'] = self.shoppingcartcount()
         if template == 'homepage.html':
             packet['r_products'] = self.recommendations(4, 0, 'none1', 'none2', 'none3', 'none4')
-            packet['r_type'] = list(self.recommendationtypes.keys())[0]
-            packet['r_string'] = list(self.recommendationtypes.values())[0]
+            packet['r_type'] = list(self.recommendationtypes.keys())[6]
+            packet['r_string'] = list(self.recommendationtypes.values())[6]
         return render_template(template, packet=packet)
 
     """ ..:: Recommendation Functions ::.. """

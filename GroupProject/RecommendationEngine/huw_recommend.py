@@ -40,16 +40,25 @@ class Recom(Resource):
         if page == 2:
             return self.similar_products(product), 200
         elif page == 3:
-            return self.boughtbyothers(weights, profileid)
+            return self.boughtbyothers(weights, profileid), 200
+        elif page == 0:
+            return self.top_viewed(), 200
         else:
-            return self.simple_recom(), 200
+            return self.top_sold(), 200
 
             # randcursor = database.products.aggregate([{ '$sample': { 'size': count } }])
             # prodids = list(map(lambda x: x['_id'], list(randcursor)))
             # return prodids, 200
 
-    def simple_recom(self):
+    def top_sold(self):
         data = PGAdmin.getdata(cursor, "SELECT productid FROM topSold LIMIT 4", False)
+        top4 = []
+        for productid in data:
+            top4.append(productid[0])
+        return top4
+
+    def top_viewed(self):
+        data = PGAdmin.getdata(cursor, "SELECT productid FROM topViewed LIMIT 4", False)
         top4 = []
         for productid in data:
             top4.append(productid[0])
@@ -90,7 +99,6 @@ class Recom(Resource):
     def boughtbyothers(self, weight, profileid):
         alreadybought = PGAdmin.getdata(cursor, f"select orderedproductid from orderedprofiles "
                                                 f"where profilesprofileid='{profileid}' ", fetchone=False)
-        print(alreadybought)
         if alreadybought != []:
             alreadybought = [item[0] for item in alreadybought]
             allbought = PGAdmin.getdata(cursor, f"select * from orderedprofiles where not profilesprofileid='{profileid}'",
