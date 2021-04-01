@@ -37,21 +37,54 @@ class Recom(Resource):
     def get(self, profileid, cat1, cat2, product, productids, page, count):
         """ This function represents the handler for GET requests coming in
         through the API. It currently returns a random sample of products. """
-        if cat2 == "dierverzorging":
-            return self.simple_recom(), 200
+        if page == 2:
+            return self.similar_products(product), 200
         elif page == 3:
             return self.boughtbyothers(weights, profileid)
         else:
-            randcursor = database.products.aggregate([{ '$sample': { 'size': count } }])
-            prodids = list(map(lambda x: x['_id'], list(randcursor)))
-            return prodids, 200
+            return self.simple_recom(), 200
+
+            # randcursor = database.products.aggregate([{ '$sample': { 'size': count } }])
+            # prodids = list(map(lambda x: x['_id'], list(randcursor)))
+            # return prodids, 200
 
     def simple_recom(self):
-        data = PGAdmin.getdata(cursor, "SELECT productid FROM topSold LIMIT 4", '', False)
+        data = PGAdmin.getdata(cursor, "SELECT productid FROM topSold LIMIT 4", False)
         top4 = []
         for productid in data:
             top4.append(productid[0])
         return top4
+
+    def similar_products(self, productid):
+        # Voordat de recommendation werkt moet je eerst de ProdCombinations.sql runnen in de database
+        weights = {1: 0.25, 2: 0.2, 3: 0.25, 4: 0.1, 5: 0.1, 6: 0.1}
+        combid = PGAdmin.getdata(cursor, "SELECT combid FROM prodcomb WHERE productid = '" + productid + "'")
+        combprods = PGAdmin.getdata(cursor, "SELECT productid FROM prodcomb WHERE combid = " + str(combid[0]) + \
+                                            "AND productid != '" + productid + "'", False)
+        recommendations = []
+        for i in range(2):
+            try:
+                recommendations.append(combprods[i][0])
+            except:
+                break
+        combinfo = PGAdmin.getdata(cursor, "SELECT * FROM prodcombinations WHERE combid = " + str(combid[0]))
+        allcombs = PGAdmin.getdata(cursor, "SELECT * FROM prodcombinations WHERE combid != " + str(combid[0]), False)
+        cap = 0.8
+        while len(recommendations) < 4:
+            for combination in allcombs:
+                total = 0
+                for i in range(1, 7):
+                    if combination[i] == combinfo[i]:
+                        total += weights[i]
+                if total > cap:
+                    recs = PGAdmin.getdata(cursor, "SELECT productid FROM prodcomb WHERE combid = " +
+                                           str(combination[0]), False)
+                    if recs[0][0] not in recommendations:
+                        recommendations.append(recs[0][0])
+                    if len(recommendations) == 4:
+                        break
+            cap -= 0.1
+        return recommendations
 
 
     def boughtbyothers(self, weight, profileid):

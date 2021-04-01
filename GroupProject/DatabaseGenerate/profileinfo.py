@@ -83,10 +83,10 @@ def createshortcut(cursor):
                            f"left join profiles on profilesprofileid=profileid)")
 
 
-connection = P.makeconnection('localhost', 'test', 'postgres', 'broodje123')
+connection = P.makeconnection('localhost', 'huwebshop', 'postgres', '1234')
 cursor = P.makecursor(connection)
-# maketable(cursor)
-# filltable(cursor)
+maketable(cursor)
+filltable(cursor)
 createshortcut(cursor)
 connection.commit()
 P.closeconnection(connection, cursor)
