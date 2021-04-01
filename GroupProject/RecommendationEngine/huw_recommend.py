@@ -42,23 +42,18 @@ class Recom(Resource):
         elif page == 3:
             return self.boughtbyothers(weights, profileid), 200
         elif page == 0:
-            return self.top_viewed(), 200
+            return self.top4('topviewed'), 200
+        elif page == 1:
+            return self.top4('popular'), 200
         else:
-            return self.top_sold(), 200
+            return self.top4('topsold'), 200
 
             # randcursor = database.products.aggregate([{ '$sample': { 'size': count } }])
             # prodids = list(map(lambda x: x['_id'], list(randcursor)))
             # return prodids, 200
 
-    def top_sold(self):
-        data = PGAdmin.getdata(cursor, "SELECT productid FROM topSold LIMIT 4", False)
-        top4 = []
-        for productid in data:
-            top4.append(productid[0])
-        return top4
-
-    def top_viewed(self):
-        data = PGAdmin.getdata(cursor, "SELECT productid FROM topViewed LIMIT 4", False)
+    def top4(self, table):
+        data = PGAdmin.getdata(cursor, "SELECT productid FROM " + table + " LIMIT 4", False)
         top4 = []
         for productid in data:
             top4.append(productid[0])
