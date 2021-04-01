@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS TopSold;
-CREATE TABLE TopSold(top4id SERIAL, productid varchar(255) NOT NULL, freq bigint NOT NULL,
+CREATE TABLE TopSold(id SERIAL, productid varchar(255) NOT NULL, freq bigint NOT NULL,
 					  PRIMARY KEY (top4id),
-					  FOREIGN KEY (productid) REFERENCES products (productid));
+					  FOREIGN KEY (productid) REFERENCES products(productid));
 
 INSERT INTO TopSold (productid, freq)
 SELECT productsproductid, count(productsproductid)
