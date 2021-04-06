@@ -26,6 +26,7 @@ database = client.huwebshop
 
 connection = PGAdmin.makeconnection('localhost', 'huwebshop', 'postgres', '1234')
 cursor = PGAdmin.makecursor(connection)
+
 weights = {'doelgroep': 0.25, 'bestcategory': 0.2, 'bestsubcategory': 0.25, 'bestbrand': 0.1, 'herhaalpreference': 0.1,
            'pricepreference': 0.1}
 
@@ -39,32 +40,28 @@ class Recom(Resource):
         through the API. Depending on the information it gets, it returns a
         different recommendation """
         if page == 2:
-            return self.similar_products(product), 200
+            return self.similar_products(weights, product, count), 200
         elif page == 3:
-            return self.boughtbyothers(weights, profileid), 200
+            return self.boughtbyothers(weights, profileid, count), 200
         elif page == 0:
-            return self.top4('topviewed'), 200
+            return self.top('topviewed', count), 200
         elif page == 1:
-            return self.top4('popular'), 200
+            return self.top('popular', count), 200
         else:
-            return self.top4('topsold'), 200
+            return self.top('topsold', count), 200
 
-            # randcursor = database.products.aggregate([{ '$sample': { 'size': count } }])
-            # prodids = list(map(lambda x: x['_id'], list(randcursor)))
-            # return prodids, 200
-
-    def top4(self, table):
-        """ This function takes te top 4 products from the specified table out of the database
-        and returns them as a list """
-        data = PGAdmin.getdata(cursor, "SELECT productid FROM " + table + " LIMIT 4", False)
+    def top(self, table, count):
+        """ This function takes the top products from the specified table out of the database
+        and returns them as a list, count defines how many products it will take """
+        data = PGAdmin.getdata(cursor, "SELECT productid FROM " + table + " LIMIT " + count, False)
         top4 = []
         for productid in data:
             top4.append(productid[0])
         return top4
 
-    def similar_products(self, productid):
-        """ This function makes a list of 4 product-ids which are similar to the productid it gets """
-        weights = {1: 0.25, 2: 0.2, 3: 0.25, 4: 0.1, 5: 0.1, 6: 0.1}
+    def similar_products(self, weights, productid, count):
+        """ This function makes a list of product-ids which are similar to the productid it gets,
+        count defines how many products it will take """
         combid = PGAdmin.getdata(cursor, "SELECT combid FROM prodcomb WHERE productid = '" + productid + "'")
         combprods = PGAdmin.getdata(cursor, "SELECT productid FROM prodcomb WHERE combid = " + str(combid[0]) + \
                                             "AND productid != '" + productid + "'", False)
@@ -77,26 +74,26 @@ class Recom(Resource):
         combinfo = PGAdmin.getdata(cursor, "SELECT * FROM prodcombinations WHERE combid = " + str(combid[0]))
         allcombs = PGAdmin.getdata(cursor, "SELECT * FROM prodcombinations WHERE combid != " + str(combid[0]), False)
         cap = 0.8
-        while len(recommendations) < 4:
+        while len(recommendations) < count:
             for combination in allcombs:
                 total = 0
                 for i in range(1, 7):
                     if combination[i] == combinfo[i]:
-                        total += weights[i]
+                        total += list(weights.values())[i-1]
                 if total > cap:
                     recs = PGAdmin.getdata(cursor, "SELECT productid FROM prodcomb WHERE combid = " +
                                            str(combination[0]), False)
                     if recs[0][0] not in recommendations:
                         recommendations.append(recs[0][0])
-                    if len(recommendations) == 4:
+                    if len(recommendations) == count:
                         break
             cap -= 0.1
         return recommendations
 
 
-    def boughtbyothers(self, weight, profileid):
-        """ This function makes a list of 4 product-ids which are taken from products bought by other profiles
-        that look similar to the current one """
+    def boughtbyothers(self, weight, profileid, count):
+        """ This function makes a list of product-ids which are taken from products bought by other profiles
+        that look similar to the current one, count defines how many products it will take """
         alreadybought = PGAdmin.getdata(cursor, f"select orderedproductid from orderedprofiles "
                                                 f"where profilesprofileid='{profileid}' ", fetchone=False)
         if alreadybought != []:
@@ -124,10 +121,10 @@ class Recom(Resource):
             result = sorted(result, key=lambda x: (x[1], x[0]), reverse=True)
             ind = 0
             recommendedproducts = []
-            while len(recommendedproducts) < 4 and ind <= len(result):
+            while len(recommendedproducts) < count and ind <= len(result):
                 [recommendedproducts.append(product) for product in bought[result[ind][0]]
                  if product not in alreadybought and product not in recommendedproducts
-                 and len(recommendedproducts) < 4]
+                 and len(recommendedproducts) < count]
                 ind += 1
             return recommendedproducts
         else:
