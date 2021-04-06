@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 import psycopg2
-import MongoDB  # TODO: markeer 'GeneralModules' directory als 'Sources Root'
+import mongodb  # TODO: markeer 'GeneralModules' directory als 'Sources Root'
 import pgadmin
 import json
 
@@ -153,11 +153,11 @@ oldtonewprofiles = {'_id': 'Profiles(profileid)', 'previously_recommended': 'Rec
 client = MongoClient()
 db = client.huwebshop
 collection = db.products
-items = MongoDB.getitems(collection)
+items = mongodb.getitems(collection)
 sessioninfo = db.sessions
-sessions = MongoDB.getitems(sessioninfo)
+sessions = mongodb.getitems(sessioninfo)
 profileinfo = db.profiles
-profiles = MongoDB.getitems(profileinfo)
+profiles = mongodb.getitems(profileinfo)
 
 
 # TODO: verander onderstaande gegevens zodat ze kloppen voor je lokale database
