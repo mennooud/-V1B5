@@ -80,13 +80,14 @@ def createshortcut(cursor):
                            f"FOREIGN KEY (orderedproductid) references products(productid))")
     P.executequery(cursor, f"insert into orderedprofiles (select profileid, productsproductid from orderedproducts "
                            f"left join sessions on sessionssessionid=sessionid "
-                           f"left join profiles on profilesprofileid=profileid)")
+                           f"left join profiles on profilesprofileid=profileid "
+                           f"where not profileid is null)")
 
 
-connection = P.makeconnection('localhost', 'huwebshop', 'postgres', '1234')
+connection = P.makeconnection('localhost', 'test', 'postgres', 'broodje123')
 cursor = P.makecursor(connection)
-maketable(cursor)
-filltable(cursor)
+# maketable(cursor)
+# filltable(cursor)
 createshortcut(cursor)
 connection.commit()
 P.closeconnection(connection, cursor)
