@@ -31,12 +31,13 @@ weights = {'doelgroep': 0.25, 'bestcategory': 0.2, 'bestsubcategory': 0.25, 'bes
 
 class Recom(Resource):
     """ This class represents the REST API that provides the recommendations for
-    the webshop. At the moment, the API simply returns a random set of products
-    to recommend."""
+    the webshop. Depending on the information it gets, it returns a
+    different recommendation """
 
     def get(self, profileid, cat1, cat2, product, productids, page, count):
         """ This function represents the handler for GET requests coming in
-        through the API. It currently returns a random sample of products. """
+        through the API. Depending on the information it gets, it returns a
+        different recommendation """
         if page == 2:
             return self.similar_products(product), 200
         elif page == 3:
@@ -53,6 +54,8 @@ class Recom(Resource):
             # return prodids, 200
 
     def top4(self, table):
+        """ This function takes te top 4 products from the specified table out of the database
+        and returns them as a list """
         data = PGAdmin.getdata(cursor, "SELECT productid FROM " + table + " LIMIT 4", False)
         top4 = []
         for productid in data:
@@ -60,7 +63,7 @@ class Recom(Resource):
         return top4
 
     def similar_products(self, productid):
-        # Voordat de recommendation werkt moet je eerst de ProdCombinations.sql runnen in de database
+        """ This function makes a list of 4 product-ids which are similar to the productid it gets """
         weights = {1: 0.25, 2: 0.2, 3: 0.25, 4: 0.1, 5: 0.1, 6: 0.1}
         combid = PGAdmin.getdata(cursor, "SELECT combid FROM prodcomb WHERE productid = '" + productid + "'")
         combprods = PGAdmin.getdata(cursor, "SELECT productid FROM prodcomb WHERE combid = " + str(combid[0]) + \
@@ -92,6 +95,8 @@ class Recom(Resource):
 
 
     def boughtbyothers(self, weight, profileid):
+        """ This function makes a list of 4 product-ids which are taken from products bought by other profiles
+        that look similar to the current one """
         alreadybought = PGAdmin.getdata(cursor, f"select orderedproductid from orderedprofiles "
                                                 f"where profilesprofileid='{profileid}' ", fetchone=False)
         if alreadybought != []:
