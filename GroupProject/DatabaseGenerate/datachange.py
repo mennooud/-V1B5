@@ -1,9 +1,9 @@
-import PGAdmin as P
-import MongoDB as M
+import pgadmin as P
+import mongodb as M
 from pymongo import MongoClient
 
 
-def deletecolumn(cursor, table, columnname, normtablename=None):
+def delete_column(cursor, table, columnname, normtablename=None):
     '''Deze functie kan een kolom en de eventueel bijbehorende normaliseringstabel weghalen'''
     if normtablename:
         cursor.execute(f'ALTER TABLE {table} DROP COLUMN IF EXISTS {normtablename+columnname+"id"}')
@@ -12,7 +12,7 @@ def deletecolumn(cursor, table, columnname, normtablename=None):
         cursor.execute(f'ALTER TABLE {table} DROP COLUMN {columnname}')
 
 
-def addcolumn(cursor, table, columnname, normtablename=None):
+def add_column(cursor, table, columnname, normtablename=None):
     '''Deze functie maakt een nieuwe kolom aan en kan hier ook een normaliseringstabel voor maken als hier een naam voor
     wordt meegegeven'''
     if normtablename:
@@ -24,7 +24,7 @@ def addcolumn(cursor, table, columnname, normtablename=None):
         P.executequery(cursor, f'ALTER TABLE {table} ADD COLUMN {columnname} VARCHAR')
 
 
-def addatatocolumn(cursor, data, table, idcolumn, oldcolumnname, columnname, normtablename=None):
+def add_data_to_column(cursor, data, table, idcolumn, oldcolumnname, columnname, normtablename=None):
     '''Deze functie vult de meegegeven data in in de meegegeven kolom en eventueel de
     meegegeven normaliseringstabel'''
     column = oldcolumnname.split('.')
@@ -64,10 +64,10 @@ allproducts = M.getitems(db.products)
 connection = P.makeconnection('localhost', 'huwebshop', 'postgres', '1234')
 cursor = P.makecursor(connection)
 
-deletecolumn(cursor, 'products', 'doelgroep', 'doelgroepen')
+delete_column(cursor, 'products', 'doelgroep', 'doelgroepen')
 
-addcolumn(cursor, 'products', 'doelgroep', 'doelgroepen')
-addatatocolumn(cursor, allproducts, 'products', 'productid', 'properties.doelgroep', 'doelgroep', 'doelgroepen')
+add_column(cursor, 'products', 'doelgroep', 'doelgroepen')
+add_data_to_column(cursor, allproducts, 'products', 'productid', 'properties.doelgroep', 'doelgroep', 'doelgroepen')
 connection.commit()
 
 P.closeconnection(connection, cursor)
