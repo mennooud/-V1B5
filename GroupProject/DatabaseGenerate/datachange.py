@@ -13,13 +13,14 @@ def delete_column(cursor, table, columnname, normtablename=None):
 
 
 def add_column(cursor, table, columnname, normtablename=None):
-    '''Deze functie maakt een nieuwe kolom aan en kan hier ook een normaliseringstabel voor maken als hier een naam voor
-    wordt meegegeven'''
+    '''Deze functie maakt een nieuwe kolom aan en kan hier ook een normaliseringstabel
+    voor maken als hier een naam voor wordt meegegeven'''
     if normtablename:
-        P.executequery(cursor, f'CREATE TABLE {normtablename} ({columnname+"id"} SERIAL PRIMARY KEY , {columnname} VARCHAR)')
+        P.executequery(cursor, f'CREATE TABLE {normtablename} ({columnname+"id"} SERIAL PRIMARY KEY , '
+                               f'{columnname} VARCHAR)')
         P.executequery(cursor, f'ALTER TABLE {table} ADD COLUMN {normtablename+columnname+"id"} INT')
-        P.executequery(cursor, f'ALTER TABLE {table} ADD FOREIGN KEY ({normtablename+columnname+"id"}) REFERENCES '
-                               f'{normtablename}({columnname+"id"})')
+        P.executequery(cursor, f'ALTER TABLE {table} ADD FOREIGN KEY ({normtablename+columnname+"id"}) '
+                               f'REFERENCES {normtablename}({columnname+"id"})')
     else:
         P.executequery(cursor, f'ALTER TABLE {table} ADD COLUMN {columnname} VARCHAR')
 
@@ -67,7 +68,8 @@ cursor = P.makecursor(connection)
 delete_column(cursor, 'products', 'doelgroep', 'doelgroepen')
 
 add_column(cursor, 'products', 'doelgroep', 'doelgroepen')
-add_data_to_column(cursor, allproducts, 'products', 'productid', 'properties.doelgroep', 'doelgroep', 'doelgroepen')
+add_data_to_column(cursor, allproducts, 'products', 'productid', 'properties.doelgroep',
+                   'doelgroep', 'doelgroepen')
 connection.commit()
 
 P.closeconnection(connection, cursor)
