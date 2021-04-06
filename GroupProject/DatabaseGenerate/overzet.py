@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 import psycopg2
 import MongoDB  # TODO: markeer 'GeneralModules' directory als 'Sources Root'
-import PGAdmin
+import pgadmin
 import json
 
 
@@ -25,10 +25,10 @@ def inputproducts(items, connection, cursor, newcolumns):
                     if item[key] is not None:
                         if isinstance(item[key], list):
                             item[key] = str(item[key])
-                        PGAdmin.insertdata(cursor, f'insert into {newcolumns[key]}'
+                        pgadmin.insertdata(cursor, f'insert into {newcolumns[key]}'
                                                    f'select (%s) where not exists ({selectquery})',
                                            (item[key], item[key]))
-                        column = PGAdmin.getdata(cursor, selectquery, (item[key],))[0]
+                        column = pgadmin.getdata(cursor, selectquery, (item[key],))[0]
                     else:
                         column = None
                     productdict[newcolumns[key].replace('(', '').replace(')', '')+'id'] = column
@@ -50,7 +50,7 @@ def inputproducts(items, connection, cursor, newcolumns):
         inputcolumns = ','.join(columns)
         inputvalues = ','.join(['%s']*len(values))
         insertquery = 'insert into Products({}) values ({})'.format(inputcolumns, inputvalues)
-        PGAdmin.insertdata(cursor, insertquery, values)
+        pgadmin.insertdata(cursor, insertquery, values)
     connection.commit()
 
 
@@ -161,8 +161,8 @@ profiles = MongoDB.getitems(profileinfo)
 
 
 # TODO: verander onderstaande gegevens zodat ze kloppen voor je lokale database
-connection = PGAdmin.makeconnection('localhost', 'Recommendation', 'postgres', 'broodje123')
-cursor = PGAdmin.makecursor(connection)
+connection = pgadmin.makeconnection('localhost', 'Recommendation', 'postgres', 'broodje123')
+cursor = pgadmin.makecursor(connection)
 cursor.execute(f"select * from products where productid='{'01001'}'")
 print(cursor.fetchone())
 print('Inputting products')
@@ -182,5 +182,4 @@ buids = inputprofiles(profiles, connection, cursor, oldtonewprofiles)
 
 print('Inputting sessions')
 inputsessions(sessions, buids, connection, cursor, oldtonewsessions)
-PGAdmin.closeconnection(connection, cursor)
-
+pgadmin.closeconnection(connection, cursor)
