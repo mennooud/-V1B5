@@ -1,4 +1,4 @@
-import PGAdmin as P
+import pgadmin as P
 
 
 def maketable(cursor):
