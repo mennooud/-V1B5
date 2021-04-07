@@ -19,6 +19,7 @@ voor onze recommendation engine.
 
 
 ## GeneralModules
+***Deze directory moet gemarkeerd worden als 'source'***<br/><br/>
 Deze directory bevat algemene modules die wij gemaakt hebben
 om bepaalde koppelingen in overzichtelijke functies te zetten.
 Op deze manier konden wij ze makkelijk herbruiken en is het
@@ -33,3 +34,6 @@ recommendations op de front-end zet.
 
 
 ## Scrum
+In deze directory staat verschillende documentatie van
+ons Scrum proces. Denk hierbij aan onze daily standups en
+onze sprint backlog.
