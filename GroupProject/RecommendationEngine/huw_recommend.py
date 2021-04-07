@@ -3,7 +3,8 @@ from flask_restful import Api, Resource, reqparse
 import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
-import PGAdmin
+import pgadmin
+import random
 
 app = Flask(__name__)
 api = Api(app)
@@ -24,8 +25,8 @@ else:
     client = MongoClient()
 database = client.huwebshop
 
-connection = PGAdmin.makeconnection('localhost', 'huwebshop', 'postgres', '1234')
-cursor = PGAdmin.makecursor(connection)
+connection = pgadmin.makeconnection('localhost', 'huwebshop', 'postgres', '1234')
+cursor = pgadmin.makecursor(connection)
 
 weights = {'doelgroep': 0.25, 'bestcategory': 0.2, 'bestsubcategory': 0.25, 'bestbrand': 0.1, 'herhaalpreference': 0.1,
            'pricepreference': 0.1}
@@ -44,16 +45,22 @@ class Recom(Resource):
         elif page == 3:
             return self.boughtbyothers(weights, profileid, count), 200
         elif page == 0:
-            return self.top('topviewed', count), 200
+            rand = random.randint(0, 2)
+            if rand == 0:
+                return self.top('topviewed', count), 200
+            else:
+                return self.top('popular', count), 200
         elif page == 1:
-            return self.same_categorie(count, cat1, cat2), 200
-        else:
-            return self.top('topsold', count), 200
+            rand = random.randint(0, 2)
+            if rand == 0:
+                return self.same_categorie(count, cat1, cat2), 200
+            else:
+                return self.top('topsold', count), 200
 
     def top(self, table, count):
         """ This function takes the top products from the specified table out of the database
         and returns them as a list, count defines how many products it will take """
-        data = PGAdmin.getdata(cursor, "SELECT productid FROM " + table + " LIMIT " + count, False)
+        data = pgadmin.getdata(cursor, "SELECT productid FROM " + table + " LIMIT " + str(count), False)
         top4 = []
         for productid in data:
             top4.append(productid[0])
@@ -62,8 +69,8 @@ class Recom(Resource):
     def similar_products(self, weights, productid, count):
         """ This function makes a list of product-ids which are similar to the productid it gets,
         count defines how many products it will take """
-        combid = PGAdmin.getdata(cursor, "SELECT combid FROM prodcomb WHERE productid = '" + productid + "'")
-        combprods = PGAdmin.getdata(cursor, "SELECT productid FROM prodcomb WHERE combid = " + str(combid[0]) + \
+        combid = pgadmin.getdata(cursor, "SELECT combid FROM prodcomb WHERE productid = '" + productid + "'")
+        combprods = pgadmin.getdata(cursor, "SELECT productid FROM prodcomb WHERE combid = " + str(combid[0]) + \
                                             "AND productid != '" + productid + "'", False)
         recommendations = []
         for i in range(2):
@@ -71,8 +78,8 @@ class Recom(Resource):
                 recommendations.append(combprods[i][0])
             except:
                 break
-        combinfo = PGAdmin.getdata(cursor, "SELECT * FROM prodcombinations WHERE combid = " + str(combid[0]))
-        allcombs = PGAdmin.getdata(cursor, "SELECT * FROM prodcombinations WHERE combid != " + str(combid[0]), False)
+        combinfo = pgadmin.getdata(cursor, "SELECT * FROM prodcombinations WHERE combid = " + str(combid[0]))
+        allcombs = pgadmin.getdata(cursor, "SELECT * FROM prodcombinations WHERE combid != " + str(combid[0]), False)
         cap = 0.8
         while len(recommendations) < count:
             for combination in allcombs:
@@ -81,7 +88,7 @@ class Recom(Resource):
                     if combination[i] == combinfo[i]:
                         total += list(weights.values())[i-1]
                 if total > cap:
-                    recs = PGAdmin.getdata(cursor, "SELECT productid FROM prodcomb WHERE combid = " +
+                    recs = pgadmin.getdata(cursor, "SELECT productid FROM prodcomb WHERE combid = " +
                                            str(combination[0]), False)
                     if recs[0][0] not in recommendations:
                         recommendations.append(recs[0][0])
@@ -93,11 +100,11 @@ class Recom(Resource):
     def boughtbyothers(self, weight, profileid, count):
         """ This function makes a list of product-ids which are taken from products bought by other profiles
         that look similar to the current one, count defines how many products it will take """
-        alreadybought = PGAdmin.getdata(cursor, f"select orderedproductid from orderedprofiles "
+        alreadybought = pgadmin.getdata(cursor, f"select orderedproductid from orderedprofiles "
                                                 f"where profilesprofileid='{profileid}' ", fetchone=False)
         if alreadybought != []:
             alreadybought = [item[0] for item in alreadybought]
-            allbought = PGAdmin.getdata(cursor, f"select * from orderedprofiles where not profilesprofileid='{profileid}'",
+            allbought = pgadmin.getdata(cursor, f"select * from orderedprofiles where not profilesprofileid='{profileid}'",
                                         fetchone=False)
             bought = {}
             for profile in allbought:
@@ -105,8 +112,8 @@ class Recom(Resource):
                     bought[profile[0]].append(profile[1])
                 else:
                     bought[profile[0]] = [profile[1]]
-            loggedin = PGAdmin.getdata(cursor, f"select * from profileproperties where profilesprofileid='{profileid}'")
-            otherprofiles = PGAdmin.getdata(cursor, f"select * from profileproperties "
+            loggedin = pgadmin.getdata(cursor, f"select * from profileproperties where profilesprofileid='{profileid}'")
+            otherprofiles = pgadmin.getdata(cursor, f"select * from profileproperties "
                                                     f"where not profilesprofileid='{profileid}'",
                                             fetchone=False)
             result = []
@@ -145,7 +152,7 @@ class Recom(Resource):
                 query += "Make-up & geuren' LIMIT " + str(count)
             else:
                 query += categorie.capitalize().replace("-", " ").replace(" en ", " & ") + "' LIMIT " + str(count)
-            data = PGAdmin.getdata(cursor, query, False)
+            data = pgadmin.getdata(cursor, query, False)
 
         else:
             query += "sub_categories WHERE products.productid = popular.productid AND " \
@@ -155,7 +162,7 @@ class Recom(Resource):
                 query += ssub_categories[sub_categorie] + "' LIMIT " + str(count)
             else:
                 query += sub_categorie.capitalize().replace("-", " ") + "' LIMIT " + str(count)
-            data = PGAdmin.getdata(cursor, query, False)
+            data = pgadmin.getdata(cursor, query, False)
 
         recommendations = []
         for product in data:
