@@ -5,6 +5,78 @@ import pgadmin
 import json
 
 
+def create_database(connection, cursor):
+    '''Deze functie maakt nieuwe tabellen aan in de database, zodat deze later gevuld kunnen worden met de
+    overgezette data'''
+    pgadmin.executequery(cursor,
+                         "DROP TABLE IF EXISTS TopSold; "
+                         "DROP TABLE IF EXISTS Orderedproducts; "
+                         "DROP TABLE IF EXISTS Recommendedproducts; "
+                         "DROP TABLE IF EXISTS Viewedproducts; "
+                         "DROP TABLE IF EXISTS Products; "
+                         "DROP TABLE IF EXISTS Brands; "
+                         "DROP TABLE IF EXISTS Categories; "
+                         "DROP TABLE IF EXISTS Genders; "
+                         "DROP TABLE IF EXISTS Sessions; "
+                         "DROP TABLE IF EXISTS Profiles; "
+                         "DROP TABLE IF EXISTS Sub_categories; "
+                         "DROP TABLE IF EXISTS Sub_sub_categories; "
+                         "DROP TABLE IF EXISTS Doelgroepen; "
+                         "CREATE TABLE Brands (brandid SERIAL, brand varchar(255), PRIMARY KEY (brandid)); "
+                         "CREATE TABLE Categories (categoryid SERIAL, category varchar(255) NOT NULL, "
+                         "PRIMARY KEY (categoryid)); "
+                         "CREATE TABLE Genders (genderid SERIAL, gender varchar(255), PRIMARY KEY (genderid)); "
+                         "CREATE TABLE Orderedproducts (orderedproductid SERIAL, Sessionssessionid "
+                         "varchar(255) NOT NULL, Productsproductid varchar(255), PRIMARY KEY (orderedproductid)); "
+                         "CREATE TABLE Products (productid varchar(255) NOT NULL, name varchar(255), "
+                         "description varchar(1023), price int, herhaalaankopen BIT, recommendable BIT, "
+                         "Brandsbrandid int, Categoriescategoryid int, Sub_sub_categoriessub_sub_categoryid int, "
+                         "Sub_categoriessub_categoryid int, Gendersgenderid int, Doelgroependoelgroepid int, "
+                         "PRIMARY KEY (productid)); "
+                         "CREATE TABLE Profiles (profileid varchar(255) NOT NULL, PRIMARY KEY (profileid)); "
+                         "CREATE TABLE Recommendedproducts (recommendedproductid SERIAL, "
+                         "Profilesprofileid varchar(255) NOT NULL, Productsproductid varchar(255), "
+                         "PRIMARY KEY (recommendedproductid)); "
+                         "CREATE TABLE Sessions (sessionid varchar(255) NOT NULL, Profilesprofileid varchar(255), "
+                         "sessionstart timestamp NOT NULL, sessionend timestamp NOT NULL, has_sale BIT NOT NULL, "
+                         "PRIMARY KEY (sessionid)); "
+                         "CREATE TABLE Sub_categories (sub_categoryid SERIAL, sub_category varchar(255) NOT NULL, "
+                         "PRIMARY KEY (sub_categoryid)); "
+                         "CREATE TABLE Sub_sub_categories (sub_sub_categoryid SERIAL, "
+                         "sub_sub_category varchar(255) NOT NULL, PRIMARY KEY (sub_sub_categoryid)); "
+                         "CREATE TABLE Doelgroepen (doelgroepid SERIAL, "
+                         "doelgroep varchar(255) NOT NULL, PRIMARY KEY (doelgroepid)); "
+                         "CREATE TABLE Viewedproducts (viewedproductid SERIAL, Profilesprofileid varchar(255) NOT NULL, "
+                         "Productsproductid varchar(255), PRIMARY KEY (viewedproductid)); "
+                         "ALTER TABLE Viewedproducts ADD CONSTRAINT FKViewedprod516306 FOREIGN KEY (Productsproductid) "
+                         "REFERENCES Products (productid); "
+                         "ALTER TABLE Viewedproducts ADD CONSTRAINT FKViewedprod836821 FOREIGN KEY (Profilesprofileid) "
+                         "REFERENCES Profiles (profileid); "
+                         "ALTER TABLE Recommendedproducts ADD CONSTRAINT FKRecommende637348 "
+                         "FOREIGN KEY (Productsproductid) REFERENCES Products (productid); "
+                         "ALTER TABLE Recommendedproducts ADD CONSTRAINT FKRecommende316833 "
+                         "FOREIGN KEY (Profilesprofileid) REFERENCES Profiles (profileid); "
+                         "ALTER TABLE Products ADD CONSTRAINT FKProducts505288 FOREIGN KEY (Gendersgenderid) "
+                         "REFERENCES Genders (genderid); "
+                         "ALTER TABLE Products ADD CONSTRAINT FKProducts973090 FOREIGN KEY "
+                         "(Sub_categoriessub_categoryid) REFERENCES Sub_categories (sub_categoryid); "
+                         "ALTER TABLE Products ADD CONSTRAINT FKProducts978174 FOREIGN KEY "
+                         "(Sub_sub_categoriessub_sub_categoryid) REFERENCES Sub_sub_categories (sub_sub_categoryid); "
+                         "ALTER TABLE Sessions ADD CONSTRAINT FKSessions493177 FOREIGN KEY (Profilesprofileid) "
+                         "REFERENCES Profiles (profileid); "
+                         "ALTER TABLE Orderedproducts ADD CONSTRAINT FKOrderedpro121984 FOREIGN KEY "
+                         "(Productsproductid) REFERENCES Products (productid); "
+                         "ALTER TABLE Orderedproducts ADD CONSTRAINT FKOrderedpro685696 FOREIGN KEY "
+                         "(Sessionssessionid) REFERENCES Sessions (sessionid); "
+                         "ALTER TABLE Products ADD CONSTRAINT FKProducts897994 FOREIGN KEY (Categoriescategoryid) "
+                         "REFERENCES Categories (categoryid); "
+                         "ALTER TABLE Products ADD CONSTRAINT FKProducts577926 FOREIGN KEY (Brandsbrandid) "
+                         "REFERENCES Brands (brandid); "
+                         "ALTER TABLE Products ADD CONSTRAINT FKProducts10000 FOREIGN KEY (Doelgroependoelgroepid) "
+                         "REFERENCES Doelgroepen (doelgroepid); ")
+    connection.commit()
+
+
 def inputproducts(items, connection, cursor, newcolumns):
     '''Deze functie zet meegegeven data in de relationele database op basis van de
     meegegeven nieuwe kolommen'''
@@ -20,15 +92,21 @@ def inputproducts(items, connection, cursor, newcolumns):
                 # deze waarde in een andere tabel moet als als foreign key in de 'Products' tabel
                 if 'Products' not in newcolumns[key]:
                     table = newcolumns[key].split('(')[0]
-                    returnedvalue = key + 'id'
-                    selectquery = f'select {returnedvalue} from {table} where {key}=(%s)'
+                    newcolumn = newcolumns[key].split('(')[1].replace(')', '')
+                    returnedvalue = newcolumn + 'id'
+                    selectquery = f'select {returnedvalue} from {table} where {newcolumn}=(%s)'
+                    if key == 'properties':
+                        try:
+                            item[key] = item['properties']['doelgroep']
+                        except KeyError:
+                            item[key] = None
                     if item[key] is not None:
                         if isinstance(item[key], list):
                             item[key] = str(item[key])
                         pgadmin.insertdata(cursor, f'insert into {newcolumns[key]}'
                                                    f'select (%s) where not exists ({selectquery})',
                                            (item[key], item[key]))
-                        column = pgadmin.getdata(cursor, selectquery, (item[key],))[0]
+                        column = pgadmin.getdata(cursor, selectquery, values=(item[key],))[0]
                     else:
                         column = None
                     productdict[newcolumns[key].replace('(', '').replace(')', '')+'id'] = column
@@ -142,7 +220,8 @@ oldtonewproducts = {'_id': 'Products(productid)', 'brand': 'Brands(brand)', 'cat
                     'gender': 'Genders(gender)', 'recommendable': 'Products(recommendable)',
                     'name': 'Products(name)', 'price': 'Products(price)',
                     'sub_category': 'Sub_categories(sub_category)',
-                    'sub_sub_category': 'Sub_sub_categories(sub_sub_category)'}
+                    'sub_sub_category': 'Sub_sub_categories(sub_sub_category)',
+                    'properties': 'Doelgroepen(doelgroep)'}
 
 oldtonewsessions = {'_id': 'sessionid', 'buid': 'profilesprofileid', 'session_start': 'sessionstart',
                     'session_end': 'sessionend', 'has_sale': 'has_sale'}
@@ -161,14 +240,14 @@ profiles = mongodb.getitems(profileinfo)
 
 
 # TODO: verander onderstaande gegevens zodat ze kloppen voor je lokale database
-connection = pgadmin.makeconnection('localhost', 'Recommendation', 'postgres', 'broodje123')
+connection = pgadmin.makeconnection('localhost', 'testjuh', 'postgres', 'broodje123')
 cursor = pgadmin.makecursor(connection)
-cursor.execute(f"select * from products where productid='{'01001'}'")
-print(cursor.fetchone())
+print('Creating database')
+create_database(connection, cursor)
 print('Inputting products')
 inputproducts(items, connection, cursor, oldtonewproducts)
 print('Inputting profiles')
-buids = inputprofiles(profiles, connection, cursor, oldtonewprofiles)
+# buids = inputprofiles(profiles, connection, cursor, oldtonewprofiles)
 
 # deze onderstaande code kan gebruikt worden als het niet lukt om de gehele tabel in één keer in te vullen
 # de buids worden dan opgeslagen in een json file zodat het mogelijk is de tabel in stappen in te vullen
@@ -181,5 +260,5 @@ buids = inputprofiles(profiles, connection, cursor, oldtonewprofiles)
 #     json.dump(newbuids, jsonfile, indent=4)
 
 print('Inputting sessions')
-inputsessions(sessions, buids, connection, cursor, oldtonewsessions)
+# inputsessions(sessions, buids, connection, cursor, oldtonewsessions)
 pgadmin.closeconnection(connection, cursor)
