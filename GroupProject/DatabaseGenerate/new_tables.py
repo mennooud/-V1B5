@@ -149,6 +149,8 @@ def product_combinations(connection, cursor):
 
 
 def profile_properties(connection, cursor):
+    '''Deze functie maakt een tabel waarin het koopgedrag van de profielen die al producten gekocht
+    hebben beschreven aan de hand van de eigenschappen van de gekochte producten.'''
     pgadmin.executequery(cursor, "DROP TABLE IF EXISTS profileproperties; "
                                  "CREATE TABLE profileproperties(profilesprofileid VARCHAR, doelgroep VARCHAR,"
                                  "bestcategory VARCHAR, bestsubcategory VARCHAR, bestbrand VARCHAR, "
@@ -221,15 +223,31 @@ def profile_properties(connection, cursor):
     connection.commit()
 
 
-connection = pgadmin.makeconnection('localhost', 'testtest', 'postgres', 'broodje123')
+def ordered_profiles(connection, cursor):
+    '''Deze functie maakt een tabel waarin de gekochte producten gekoppeld zijn aan de profielen, zodat
+    deze niet meer middels meerdere join statements aan elkaar hoeven worden geplakt.'''
+    pgadmin.executequery(cursor,"drop table if exists orderedprofiles; "
+                                "create table orderedprofiles( profilesprofileid varchar, "
+                                "orderedproductid varchar, FOREIGN KEY (profilesprofileid) references profiles(profileid), "
+                                "FOREIGN KEY (orderedproductid) references products(productid));")
+    pgadmin.executequery(cursor, "insert into orderedprofiles (select profileid, productsproductid from orderedproducts "
+                                 "left join sessions on sessionssessionid=sessionid "
+                                 "left join profiles on profilesprofileid=profileid "
+                                 "where not profileid is null)")
+    connection.commit()
+
+connection = pgadmin.makeconnection('localhost', 'deechte', 'postgres', 'broodje123')
 cursor = pgadmin.makecursor(connection)
 print('Making table for most sold products...')
-# top_sold(connection, cursor)
+top_sold(connection, cursor)
 print('Making table for most viewed products...')
-# top_viewed(connection, cursor)
+top_viewed(connection, cursor)
 print('Making table for most popular products...')
-# popular_products(connection, cursor)
+popular_products(connection, cursor)
 print('Making table for all product combinations...')
-# product_combinations(connection, cursor)
+product_combinations(connection, cursor)
 print('Making table for all profile properties...')
 profile_properties(connection, cursor)
+print('Making table connecting ordered products and profiles...')
+ordered_profiles(connection, cursor)
+print('All done :)')
