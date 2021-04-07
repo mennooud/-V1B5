@@ -148,13 +148,88 @@ def product_combinations(connection, cursor):
     connection.commit()
 
 
+def profile_properties(connection, cursor):
+    pgadmin.executequery(cursor, "DROP TABLE IF EXISTS profileproperties; "
+                                 "CREATE TABLE profileproperties(profilesprofileid VARCHAR, doelgroep VARCHAR,"
+                                 "bestcategory VARCHAR, bestsubcategory VARCHAR, bestbrand VARCHAR, "
+                                 "herhaalpreference BIT,"
+                                 "pricepreference VARCHAR, CONSTRAINT checkprice CHECK (pricepreference IN "
+                                 "('LOW', 'MIDDLE', 'HIGH')), FOREIGN KEY (profilesprofileid) "
+                                 "REFERENCES profiles(profileid)); ")
+    pgadmin.executequery(cursor,
+                         "WITH subquery AS(select profileid, doelgroep, category, sub_category, brand, herhaalaankopen,"
+                         "price from profiles right join sessions on profileid=profilesprofileid "
+                         "right join orderedproducts on sessionid=sessionssessionid "
+                         "left join products on productsproductid=productid "
+                         "left join categories on categoriescategoryid=categoryid "
+                         "left join doelgroepen on doelgroependoelgroepid=doelgroepid "
+                         "left join sub_categories on sub_categoriessub_categoryid=sub_categoryid "
+                         "left join brands on brandsbrandid=brandid "
+                         "where not profileid is null), "
+                         "subdoelgroep1 AS(select profileid, doelgroep, count(doelgroep) as frequency from subquery "
+                         "group by profileid, doelgroep), "
+                         "subdoelgroep2 AS(select profileid, max(frequency) as mostfrequent from subdoelgroep1 "
+                         "group by profileid), "
+                         "subdoelgroep AS(select subdoelgroep2.profileid, doelgroep from subdoelgroep2 "
+                         "left join subdoelgroep1 on subdoelgroep2.mostfrequent=subdoelgroep1.frequency and "
+                         "subdoelgroep2.profileid=subdoelgroep1.profileid), "
+                         "subcategory1 AS(select profileid, category, count(category) as frequency from subquery "
+                         "group by profileid, category), "
+                         "subcategory2 AS(select profileid, max(frequency) as mostfrequent from subcategory1 "
+                         "group by profileid), "
+                         "subcategory AS(select subcategory2.profileid, category from subcategory2 "
+                         "left join subcategory1 on subcategory2.mostfrequent=subcategory1.frequency and "
+                         "subcategory2.profileid=subcategory1.profileid), "
+                         "subsubcategory1 AS(select profileid, sub_category, count(sub_category) as frequency from subquery "
+                         "group by profileid, sub_category), "
+                         "subsubcategory2 AS(select profileid, max(frequency) as mostfrequent from subsubcategory1 "
+                         "group by profileid), "
+                         "subsubcategory AS(select subsubcategory2.profileid, sub_category from subsubcategory2 "
+                         "left join subsubcategory1 on subsubcategory2.mostfrequent=subsubcategory1.frequency and "
+                         "subsubcategory2.profileid=subsubcategory1.profileid), "
+                         "subbrand1 AS(select profileid, brand, count(brand) as frequency from subquery "
+                         "group by profileid, brand), "
+                         "subbrand2 AS(select distinct(profileid), max(frequency) as mostfrequent from subbrand1 "
+                         "group by profileid), "
+                         "subbrand AS(select subbrand2.profileid, brand from subbrand2 "
+                         "left join subbrand1 on subbrand2.mostfrequent=subbrand1.frequency and "
+                         "subbrand2.profileid=subbrand1.profileid), "
+                         "subherhaal1 AS(select profileid, herhaalaankopen, count(herhaalaankopen) as frequency from subquery "
+                         "group by profileid, herhaalaankopen), "
+                         "subherhaal2 AS(select distinct(profileid), max(frequency) as mostfrequent from subherhaal1 "
+                         "group by profileid), "
+                         "subherhaal AS(select subherhaal2.profileid, herhaalaankopen from subherhaal2 "
+                         "left join subherhaal1 on subherhaal2.mostfrequent=subherhaal1.frequency and "
+                         "subherhaal2.profileid=subherhaal1.profileid), "
+                         "subprice1 AS(select profileid, round(avg(price), 0) as averageprice from subquery "
+                         "group by profileid), "
+                         "subprice AS(select profileid, averageprice, "
+                         "case when averageprice > 0 and averageprice<250 then 'LOW' "
+                         "when averageprice>=250 and averageprice<=600 then 'MIDDLE' "
+                         "when averageprice>600 then 'HIGH' "
+                         "end as pricecategory "
+                         "from subprice1)"
+                         "insert into profileproperties "
+                         "(SELECT subdoelgroep.profileid, doelgroep, category, sub_category, brand, "
+                         "herhaalaankopen, pricecategory "
+                         "from subdoelgroep left join subcategory "
+                         "on subdoelgroep.profileid=subcategory.profileid "
+                         "left join subsubcategory on subdoelgroep.profileid=subsubcategory.profileid "
+                         "left join subbrand on subdoelgroep.profileid=subbrand.profileid "
+                         "left join subherhaal on subdoelgroep.profileid=subherhaal.profileid "
+                         "left join subprice on subdoelgroep.profileid=subprice.profileid)")
+    connection.commit()
+
+
 connection = pgadmin.makeconnection('localhost', 'testtest', 'postgres', 'broodje123')
 cursor = pgadmin.makecursor(connection)
 print('Making table for most sold products...')
-top_sold(connection, cursor)
+# top_sold(connection, cursor)
 print('Making table for most viewed products...')
-top_viewed(connection, cursor)
+# top_viewed(connection, cursor)
 print('Making table for most popular products...')
-popular_products(connection, cursor)
+# popular_products(connection, cursor)
 print('Making table for all product combinations...')
-product_combinations(connection, cursor)
+# product_combinations(connection, cursor)
+print('Making table for all profile properties...')
+profile_properties(connection, cursor)
