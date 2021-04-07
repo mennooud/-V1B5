@@ -46,7 +46,7 @@ class Recom(Resource):
         elif page == 0:
             return self.top('topviewed', count), 200
         elif page == 1:
-            return self.top('popular', count), 200
+            return self.same_categorie(count, cat1, cat2), 200
         else:
             return self.top('topsold', count), 200
 
@@ -90,7 +90,6 @@ class Recom(Resource):
             cap -= 0.1
         return recommendations
 
-
     def boughtbyothers(self, weight, profileid, count):
         """ This function makes a list of product-ids which are taken from products bought by other profiles
         that look similar to the current one, count defines how many products it will take """
@@ -129,6 +128,39 @@ class Recom(Resource):
             return recommendedproducts
         else:
             return self.simple_recom()
+
+    def same_categorie(self, count, categorie, sub_categorie):
+        """ This function makes a list of product-ids which are the most popular products from the specified
+        (sub)category, count defines how many products it will take. It will only look at the category when there
+        is no sub_category available """
+        query = "SELECT popular.productid FROM popular, products, "
+        ssub_categories = {'elektronica-en-media': 'Elektronica & media', 'scheren-en-ontharen': 'Scheren & ontharen',
+                           'boeken-en-tijdschriften': 'Boeken & tijdschriften',  'make-up': 'Make-up',
+                           'sieraden-en-bijoux': 'Sieraden & bijoux', 'make-up-accessoires': 'Make-up accessoires'}
+
+        if sub_categorie == 'none2':
+            query += "categories WHERE products.productid = popular.productid AND products.categoriescategoryid = " \
+                     "categories.categoryid AND categories.category = '"
+            if categorie == 'make-up-en-geuren':
+                query += "Make-up & geuren' LIMIT " + str(count)
+            else:
+                query += categorie.capitalize().replace("-", " ").replace(" en ", " & ") + "' LIMIT " + str(count)
+            data = PGAdmin.getdata(cursor, query, False)
+
+        else:
+            query += "sub_categories WHERE products.productid = popular.productid AND " \
+                    "products.sub_categoriessub_categoryid = sub_categories.sub_categoryid AND " \
+                    "sub_categories.sub_category = '"
+            if sub_categorie in ssub_categories:
+                query += ssub_categories[sub_categorie] + "' LIMIT " + str(count)
+            else:
+                query += sub_categorie.capitalize().replace("-", " ") + "' LIMIT " + str(count)
+            data = PGAdmin.getdata(cursor, query, False)
+
+        recommendations = []
+        for product in data:
+            recommendations.append(product[0])
+        return recommendations
 
 
 # This method binds the Recom class to the REST API, to parse specifically
