@@ -15,7 +15,18 @@ In deze directory staan de scripts die wij gebruikt hebben om
 de MongoDB data over te zetten naar een relationele database
 in PGAdmin. Ook staan hier de scripts die wij gebruikt hebben
 om vanuit de relationele database zelf nieuwe data genereert
-voor onze recommendation engine.
+voor onze recommendation engine. De 'datachange' file is niet
+essentieel in het opzetten van de database.
+
+#### Stappen
+
+##### 1. Run 'overzet.py'
+voor het overzetten van de normale data naar de relationele
+database.
+
+##### 2. Run 'new_tables.py'
+voor het maken van de nieuwe tabellen voor de recommendation
+engine op basis van voorgaande data.
 
 
 ## GeneralModules
