@@ -32,9 +32,25 @@ def top_viewed(connection, cursor):
     connection.commit()
 
 
+def popular_products(connection, cursor):
+    '''Deze functie maakt een nieuwe tabel aan en zet daar de producten in op volgorde van
+    populariteit. Dit is een combinatie van hoevaak de producten bekeken en gekocht zijn.'''
+    pgadmin.executequery(cursor, "DROP TABLE IF EXISTS popular; "
+                                 "CREATE TABLE popular(id SERIAL, productid varchar(255), pop int, "
+                                 "PRIMARY KEY (id), FOREIGN KEY (productid) REFERENCES products(productid)); "
+                                 "INSERT INTO popular (productid, pop) "
+                                 "SELECT topsold.productid, (topsold.id + topviewed.id) as pop "
+                                 "FROM topsold, topviewed "
+                                 "WHERE topsold.productid = topviewed.productid "
+                                 "ORDER BY pop")
+    connection.commit()
+
+
 connection = pgadmin.makeconnection('localhost', 'testtest', 'postgres', 'broodje123')
 cursor = pgadmin.makecursor(connection)
 print('Making table for most sold products...')
 top_sold(connection, cursor)
 print('Making table for most viewed products...')
 top_viewed(connection, cursor)
+print('Making table for most popular products...')
+popular_products(connection, cursor)
