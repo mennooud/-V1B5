@@ -11,6 +11,14 @@ naar de PGAdmin database (1+ uur).
 
 
 ## DatabaseGenerate
+In deze directory staan de scripts die wij gebruikt hebben om
+de MongoDB data over te zetten naar een relationele database
+in PGAdmin. Ook staan hier de scripts die wij gebruikt hebben
+om vanuit de relationele database zelf nieuwe data genereert
+voor onze recommendation engine.
+
+
+## GeneralModules
 
 
 ## RecommendationEngine
