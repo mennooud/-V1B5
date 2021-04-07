@@ -19,6 +19,11 @@ voor onze recommendation engine.
 
 
 ## GeneralModules
+Deze directory bevat algemene modules die wij gemaakt hebben
+om bepaalde koppelingen in overzichtelijke functies te zetten.
+Op deze manier konden wij ze makkelijk herbruiken en is het
+makkelijker voor de lezer te begrijpen wat bepaalde queries
+doen.
 
 
 ## RecommendationEngine
