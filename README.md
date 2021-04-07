@@ -27,6 +27,9 @@ doen.
 
 
 ## RecommendationEngine
+In deze directory staat de front-end die wij verkregen hebben
+van de HU met daarbij onze recommendation engine die de
+recommendations op de front-end zet.
 
 
 ## Scrum
