@@ -40,4 +40,6 @@ def getdata(cursor, query, fetchone=True, values=None):
 
 
 def executequery(cursor, query):
+    '''Deze functie voert nog overige queries uit die nog wat complexer zijn en niet binne de scope van
+    voorgaande functies vallen'''
     cursor.execute(query)
