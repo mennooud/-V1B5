@@ -55,7 +55,7 @@ class Recom(Resource):
             if choice == 0:
                 return self.similar_shopping_cart(productids, count), 200
             else:
-                return self.boughtbyothers(weights, profileid, count)
+                return self.boughtbyothers(weights, profileid, count), 200
 
     def top(self, table, count):
         """ This function takes the top products from the specified table out of the database
