@@ -37,7 +37,7 @@ class HUWebshop(object):
                            'combination':'Combineert goed met','behaviour':'Passend bij uw gedrag',
                            'personal':'Persoonlijk aanbevolen','othersbought': 'Anderen kochten ook',
                            'mostviewed': "Meest bekeken", 'mostbought': 'Meest gekocht',
-                           'mostpopular': "Populairste producten"}
+                           'mostpopular': "Populairste producten", 'same_categorie': "Populairste uit deze categorie"}
 
     """ ..:: Initialization and Category Index Functions ::.. """
 
@@ -285,8 +285,8 @@ class HUWebshop(object):
             'prevpage': pagepath+str(page-1) if (page > 1) else False, \
             'nextpage': pagepath+str(page+1) if (session['items_per_page']*page < prodcount) else False, \
             'r_products':self.recommendations(4, 1, cat1, cats2, 'none3', 'none4', 0), \
-            'r_type':list(self.recommendationtypes.keys())[0],\
-            'r_string':list(self.recommendationtypes.values())[0]\
+            'r_type':list(self.recommendationtypes.keys())[9],\
+            'r_string':list(self.recommendationtypes.values())[9]\
             })
 
     def productdetail(self, productid):
