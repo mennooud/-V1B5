@@ -128,7 +128,11 @@ Luka
 3. Als het lang duurt voordat wij onze feedback terugkrijgen op ons adviesrapport, duurt het ook langer voordat ik daaraan kan beginnen.
 
 Timo
-• 	
+1. Gister ben ik bezig geweest met opschonen van code, en een begin gemaakt aan de recommendation 'zelfde categorie'
+
+2. Vandaag ga ik verder met 'zelfde categorie' en daarna een begin maken aan 'similar_shopping_cart'
+
+3. Als ik bij 'zelfde categorie' tegen problemen aan loop kan ik nog niet beginnen met 'similar_shopping_cart'
 
 
 Donderdag 08-04-2021
@@ -136,15 +140,23 @@ Donderdag 08-04-2021
 Menno
 1.  Gisteren heb ik mijn recommendation verder proberen uit te werken.
 
-2.  Vandaag ga ik een uitgewerkte omschrijving maken van mijn recommendation.
+2.  Vandaag ga ik een uitgewerkte omschrijving maken van mijn recommendation. Daarnaast meehelpen met het adviesrapport.
 
 3.  Wegens ziekte krijg ik mijn recommendation niet tijdig gereed, waar ik al bang voor was.
 
 Luka
+1. Ik ben gisteren bezig geweest met het opmaken van de github en ben verder gegaan met het adviesrapport nadat wij feedback op ons concept hadden gekregen.
 
+2. Vandaag ga ik het adviesrapport afmaken en de laatste puntjes op de i zetten wat betreft onze recommendation engine.
+
+3. Ik ben niet zo goed in schrijven, dus ik hoop dat ik daar niet al te lang op vasthaak.
 
 Timo
+1. Gister heb ik de recommendation 'zelfde categorie' afgemaakt en 'similar_shopping_cart' bijna af
 
+2. Vandaag ga ik 'similar_shopping_cart' afmaken en zorgen dat alle recommendations op de juiste pagina's worden weergeven, ook ga ik meehelpen met het     adviesrapport schrijven.
+
+3. Zolang ik bij 'similar_shopping_cart' niet tegen problemen aan loop, moet alles lukken
 
 
 
