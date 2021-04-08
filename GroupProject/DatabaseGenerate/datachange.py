@@ -49,7 +49,7 @@ def add_data_to_column(cursor, data, table, idcolumn, oldcolumnname, columnname,
                     f"NOT EXISTS (SELECT * FROM {normtablename} WHERE {columnname}=(%s))"
             P.insertdata(cursor, query, (item, item))
             inputvalue = P.getdata(cursor, f'SELECT {columnname+"id"} FROM {normtablename} '
-                                           f"WHERE {columnname}=%s", (item,))
+                                           f"WHERE {columnname}=%s", values=(item,))
             P.insertdata(cursor, f"UPDATE {table} SET {normtablename+columnname+'id'}={inputvalue[0]} "
                                  f"WHERE {idcolumn}=%s", (id,))
         else:
@@ -62,7 +62,7 @@ db = client.huwebshop
 allproducts = M.getitems(db.products)
 
 # TODO: verander onderstaande gegevens naar gegevens die kloppen voor je lokale database
-connection = P.makeconnection('localhost', 'huwebshop', 'postgres', '1234')
+connection = P.makeconnection('localhost', 'temp', 'postgres', 'broodje123')
 cursor = P.makecursor(connection)
 
 delete_column(cursor, 'products', 'doelgroep', 'doelgroepen')
