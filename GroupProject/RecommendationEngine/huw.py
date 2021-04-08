@@ -36,7 +36,8 @@ class HUWebshop(object):
     recommendationtypes = {'popular':"Anderen kochten ook",'similar':"Soortgelijke producten",
                            'combination':'Combineert goed met','behaviour':'Passend bij uw gedrag',
                            'personal':'Persoonlijk aanbevolen','othersbought': 'Anderen kochten ook',
-                           'mostviewed': "Meest bekeken"}
+                           'mostviewed': "Meest bekeken", 'mostbought': 'Meest gekocht',
+                           'mostpopular': "Populairste producten"}
 
     """ ..:: Initialization and Category Index Functions ::.. """
 
@@ -222,21 +223,28 @@ class HUWebshop(object):
         packet['shopping_cart'] = session['shopping_cart']
         packet['shopping_cart_count'] = self.shoppingcartcount()
         if template == 'homepage.html':
-            packet['r_products'] = self.recommendations(4, 0, 'none1', 'none2', 'none3', 'none4')
-            packet['r_type'] = list(self.recommendationtypes.keys())[6]
-            packet['r_string'] = list(self.recommendationtypes.values())[6]
+            rand = random.randint(0, 2)
+            if rand == 0:
+                recom = 6
+            elif rand == 1:
+                recom = 7
+            else:
+                recom = 8
+            packet['r_products'] = self.recommendations(4, 0, 'none1', 'none2', 'none3', 'none4', rand)
+            packet['r_type'] = list(self.recommendationtypes.keys())[recom]
+            packet['r_string'] = list(self.recommendationtypes.values())[recom]
         return render_template(template, packet=packet)
 
     """ ..:: Recommendation Functions ::.. """
 
-    def recommendations(self, count, page, cat1, cat2, prodid, prodids):
+    def recommendations(self, count, page, cat1, cat2, prodid, prodids, rand):
         """ This function returns the recommendations from the provided page
         and context, by sending a request to the designated recommendation
         service. At the moment, it only transmits the profile ID and the number
         of expected recommendations; to have more user information in the REST
         request, this function would have to change."""
         resp = requests.get(self.recseraddress+"/"+session['profile_id']+"/"+cat1+"/"+cat2+"/"+str(prodid)+"/"+
-                            str(prodids)+"/"+str(page)+"/"+str(count))
+                            str(prodids)+"/"+str(page)+"/"+str(rand)+"/"+str(count))
         if resp.status_code == 200:
             recs = eval(resp.content.decode())
             queryfilter = {"_id": {"$in": recs}}
@@ -276,7 +284,7 @@ class HUWebshop(object):
             'pend': skipindex + session['items_per_page'] if session['items_per_page'] > 0 else prodcount, \
             'prevpage': pagepath+str(page-1) if (page > 1) else False, \
             'nextpage': pagepath+str(page+1) if (session['items_per_page']*page < prodcount) else False, \
-            'r_products':self.recommendations(4, 1, cat1, cats2, 'none3', 'none4'), \
+            'r_products':self.recommendations(4, 1, cat1, cats2, 'none3', 'none4', 0), \
             'r_type':list(self.recommendationtypes.keys())[0],\
             'r_string':list(self.recommendationtypes.values())[0]\
             })
@@ -287,7 +295,7 @@ class HUWebshop(object):
         product = self.database.products.find_one({"_id":str(productid)})
         return self.renderpackettemplate('productdetail.html', {'product':product,\
             'prepproduct':self.prepproduct(product),\
-            'r_products':self.recommendations(4, 2, 'none1', 'none2', productid, 'none4'), \
+            'r_products':self.recommendations(4, 2, 'none1', 'none2', productid, 'none4', 0), \
             'r_type':list(self.recommendationtypes.keys())[1],\
             'r_string':list(self.recommendationtypes.values())[1]})
 
@@ -302,10 +310,19 @@ class HUWebshop(object):
             prodids += tup[0]+":"
         if prodids == "":
             prodids = "none4"
+        if prodids != "none4":
+            rand = random.randint(0, 1)
+            if rand == 0:
+                recom = 1
+            else:
+                recom = 5
+        else:
+            rand = 1
+            recom = 5
         return self.renderpackettemplate('shoppingcart.html',{'itemsincart':i,\
-            'r_products':self.recommendations(4, 3, 'none1', 'none2', 'none3', prodids), \
-            'r_type':list(self.recommendationtypes.keys())[5],\
-            'r_string':list(self.recommendationtypes.values())[5]})
+                'r_products':self.recommendations(4, 3, 'none1', 'none2', 'none3', prodids, rand), \
+                'r_type':list(self.recommendationtypes.keys())[recom],\
+                'r_string':list(self.recommendationtypes.values())[recom]})
 
     def categoryoverview(self):
         """ This subpage shows all top-level categories in its main menu. """

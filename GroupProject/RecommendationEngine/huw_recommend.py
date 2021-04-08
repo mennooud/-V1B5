@@ -36,26 +36,26 @@ class Recom(Resource):
     the webshop. Depending on the information it gets, it returns a
     different recommendation """
 
-    def get(self, profileid, cat1, cat2, product, productids, page, count):
+    def get(self, profileid, cat1, cat2, product, productids, page, choice, count):
         """ This function represents the handler for GET requests coming in
         through the API. Depending on the information it gets, it returns a
         different recommendation """
-        if page == 2:
-            return self.similar_products(weights, product, count), 200
-        elif page == 3:
-            return self.boughtbyothers(weights, profileid, count), 200
-        elif page == 0:
-            rand = random.randint(0, 2)
-            if rand == 0:
+        if page == 0:
+            if choice == 0:
                 return self.top('topviewed', count), 200
+            elif choice == 1:
+                return self.top('topsold', count), 200
             else:
                 return self.top('popular', count), 200
         elif page == 1:
-            rand = random.randint(0, 2)
-            if rand == 0:
-                return self.same_categorie(count, cat1, cat2), 200
+            return self.same_categorie(count, cat1, cat2), 200
+        elif page == 2:
+            return self.similar_products(weights, product, count), 200
+        elif page == 3:
+            if choice == 0:
+                return self.similar_shopping_cart(productids, count), 200
             else:
-                return self.top('topsold', count), 200
+                return self.boughtbyothers(weights, profileid, count)
 
     def top(self, table, count):
         """ This function takes the top products from the specified table out of the database
@@ -66,7 +66,7 @@ class Recom(Resource):
             top4.append(productid[0])
         return top4
 
-    def similar_products(self, weights, productid, count):
+    def similar_products(self, weights, productid, count, skip=[]):
         """ This function makes a list of product-ids which are similar to the productid it gets,
         count defines how many products it will take """
         combid = pgadmin.getdata(cursor, "SELECT combid FROM prodcomb WHERE productid = '" + productid + "'")
@@ -75,7 +75,8 @@ class Recom(Resource):
         recommendations = []
         for i in range(2):
             try:
-                recommendations.append(combprods[i][0])
+                if len(recommendations) < count and combprods[i][0] not in skip:
+                    recommendations.append(combprods[i][0])
             except:
                 break
         combinfo = pgadmin.getdata(cursor, "SELECT * FROM prodcombinations WHERE combid = " + str(combid[0]))
@@ -90,12 +91,32 @@ class Recom(Resource):
                 if total > cap:
                     recs = pgadmin.getdata(cursor, "SELECT productid FROM prodcomb WHERE combid = " +
                                            str(combination[0]), False)
-                    if recs[0][0] not in recommendations:
+                    if recs[0][0] not in recommendations and recs[0][0] not in skip:
                         recommendations.append(recs[0][0])
                     if len(recommendations) == count:
                         break
             cap -= 0.1
         return recommendations
+
+    def similar_shopping_cart(self, productids, count):
+        """ This function looks at the products in the shopping cart, and using similar_products()
+        it returns a list of similar products to those in the shopping cart,
+        count defines how many products it will take """
+        products = productids.split(":")
+        product_ids = []
+        if len(products) > count + 1:
+            con = count
+        else:
+            if len(products) == count:
+                con = count
+            else:
+                con = len(products) - 1
+        for product in products[:-1]:
+            if len(product_ids) < count:
+                product_ids.extend(self.similar_products(weights, product, int(count/con), product_ids))
+        if len(product_ids) < count:
+            product_ids.extend(self.similar_products(weights, products[0], count/count, product_ids))
+        return product_ids
 
     def boughtbyothers(self, weight, profileid, count):
         """ This function makes a list of product-ids which are taken from products bought by other profiles
@@ -172,4 +193,4 @@ class Recom(Resource):
 
 # This method binds the Recom class to the REST API, to parse specifically
 # requests in the format described below.
-api.add_resource(Recom, "/<string:profileid>/<string:cat1>/<string:cat2>/<string:product>/<string:productids>/<int:page>/<int:count>")
+api.add_resource(Recom, "/<string:profileid>/<string:cat1>/<string:cat2>/<string:product>/<string:productids>/<int:page>/<int:choice>/<int:count>")

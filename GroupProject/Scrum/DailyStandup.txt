@@ -72,3 +72,79 @@ Timo
 •    Vandaag ga ik de demo voorbereiden, en mijn teamgenoten helpen met eventuele problemen waar ze nog tegen aan lopen
 •	   We missen een teamlid, al de hele week
 
+Dinsdag 30-03-2021
+
+Menno
+•	Ziek
+
+Luka
+1. Gisteren heb ik geholpen met de planning en ben ik bezig geweest met een programma dat kolommen aan onze oorspronkelijke database kan toevoegen/weghalen met eventueel normaliseringstabellen erbij.
+
+2. Vandaag ga ik aan de gang met de recommendation voor 'anderen kochten ook'. Ik ga dan kijken of ik al in staat ben om de nieuwe tabel te maken en die in te vullen met alle profieleigenschappen. Hiernaast ben ik van plan om ook al het gewicht te gaan bepalen van de verschillende eigenschappen voor het uiteindelijke algoritme.
+
+3. Het enige obstakel zou kunnen zijn als ik tegen heel veel problemen aanlopen met het invullen van de database, want ik moet dan ook nog het algoritme maken en de werking van deze recommendation beschrijven en zou dus in tijdnood komen als dit te lang duurt.
+
+Timo
+1. Gisteren heb ik de soortgelijke producten goed uitgewerkt en een begin gemaakt met de sql code voor de database voor de soortgelijke producten, ik heb ook meegeholpen aan de planning.
+
+2. Vandaag ga ik verder met het coderen voor de soortgelijke producten, zowel voor de database als voor de recommendation-engine.
+
+3. De database moest nog aangepast worden, hoe sneller dat af is hoe meer ik vandaag kan bereiken
+
+
+Woensdag 31-03-2021
+
+Menno
+•	Ziek
+
+Luka
+1. Gisteren was ik bezig met het maken van een nieuwe tabel voor profieleigenschappen voor de recommendation 'anderen kochten ook'.
+
+2. Vandaag ga ik aan de slag met het afmaken van de recommendation 'anderen kochten ook' en het afmaken van de conceptversie van het adviesrapport.
+
+3. Als ik niet in staat ben de laatste probleempjes op te lossen voor de recommendation 'anderen kochten ook', zal ik niet in staat zijn deze te laten zien bij de demo en beginnen we volgende sprint met een achterstand.	
+
+Timo
+1. gisteren was ik begonnen met een tabel maken voor alle combinaties van eigenschappen waar er producten van zijn
+
+2. Vandaag ga ik de tabel afmaken en het coderen van de soortgelijke producten, waar rekening wordt gehouden met de weging van elk eigenschap
+
+3. De tabel moet eerst af voordat ik aan de code kan beginnen 
+
+Woensdag 07-04-2021
+
+Menno
+1. Ik ben gisteren bezig geweest met het omschrijven van mijn recommendation
+
+2. Vandaag ga ik verder met het uitwerken van mijn recommendation
+
+3. Wegens ziekte ben ik bang dat ik mijn recommendation niet tijdig gereed zal krijgen.
+
+Luka
+1. Ik ben gisteren bezig geweest met het afronden van mijn recommendation en ben begonnen aan het opmaken van onze github.
+
+2. Vandaag ga ik verder met het opmaken van de github en ga daarna eventueel nog helpen met recommendations of het adviesrapport verder opstellen.
+
+3. Als het lang duurt voordat wij onze feedback terugkrijgen op ons adviesrapport, duurt het ook langer voordat ik daaraan kan beginnen.
+
+Timo
+• 	
+
+
+Donderdag 08-04-2021
+
+Menno
+1.  Gisteren heb ik mijn recommendation verder proberen uit te werken.
+
+2.  Vandaag ga ik een uitgewerkte omschrijving maken van mijn recommendation.
+
+3.  Wegens ziekte krijg ik mijn recommendation niet tijdig gereed, waar ik al bang voor was.
+
+Luka
+
+
+Timo
+
+
+
+
